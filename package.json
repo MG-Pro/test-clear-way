@@ -9,7 +9,7 @@
     "test": "ng test"
   },
   "prettier": {
-    "printWidth": 100,
+    "printWidth": 120,
     "singleQuote": true,
     "overrides": [
       {
@@ -29,6 +29,12 @@
     "@angular/forms": "^21.1.0",
     "@angular/platform-browser": "^21.1.0",
     "@angular/router": "^21.1.0",
+    "@taiga-ui/cdk": "^4.68.0",
+    "@taiga-ui/core": "^4.68.0",
+    "@taiga-ui/event-plugins": "^4.0.2",
+    "@taiga-ui/icons": "^4.68.0",
+    "@taiga-ui/kit": "^4.68.0",
+    "@taiga-ui/layout": "^4.68.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
@@ -37,6 +43,8 @@
     "@angular/cli": "^21.1.2",
     "@angular/compiler-cli": "^21.1.0",
     "jsdom": "^27.1.0",
+    "less": "^4.5.1",
+    "prettier": "3.8.1",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
   }

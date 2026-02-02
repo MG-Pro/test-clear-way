@@ -1,0 +1,11 @@
+<div tuiAppearance="flat-destructive" tuiCardLarge class="document" [style.width.px]="width()">
+  <h3>{{ documentData()?.name | uppercase }}</h3>
+
+  @for (img of documentData()?.pages; track img.number) {
+    <div class="document-page">
+      <img [ngSrc]="img.imageUrl" [width]="1000" [height]="1" [alt]="img.number" priority />
+    </div>
+  }
+</div>
+
+<app-zoomer (zoomChange)="onZoomChange($event)" />

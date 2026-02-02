@@ -1,0 +1,11 @@
+<div class="zoomer">
+  <div class="scale">
+    <tui-badge appearance="neutral" size="xl"> {{ (currentScale * 100).toFixed(0) }}% </tui-badge>
+  </div>
+
+  <div tuiGroup class="zoom-controls">
+    <button tuiButton appearance="outline" (click)="zoomIn()">+</button>
+    <button tuiButton appearance="outline" (click)="zoomOut()">-</button>
+    <button tuiButton appearance="outline" (click)="resetZoom()">Reset</button>
+  </div>
+</div>
