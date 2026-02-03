@@ -9,3 +9,15 @@
     <button tuiButton appearance="outline" (click)="resetZoom()">Reset</button>
   </div>
 </div>
+
+<button
+  appearance="glass"
+  tuiButton
+  type="button"
+  [disabled]="saveDisabled()"
+  (click)="onSave.emit()"
+>
+  Save
+</button>
+
+<button appearance="accent" tuiButton type="button" (click)="onClear.emit()">Clear</button>

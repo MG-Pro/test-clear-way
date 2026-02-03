@@ -2,10 +2,23 @@
   <h3>{{ documentData()?.name | uppercase }}</h3>
 
   @for (img of documentData()?.pages; track img.number) {
-    <div class="document-page">
-      <img [ngSrc]="img.imageUrl" [width]="1000" [height]="1" [alt]="img.number" priority />
+    <div class="document-page" (click)="onPageClick($event, img.number)">
+      <img
+        [ngSrc]="img.imageUrl"
+        [width]="1000"
+        [height]="1"
+        [alt]="img.number"
+        priority
+        draggable="false"
+      />
+      <div class="annotations" #page [attr.data-item-id]="img.number"></div>
     </div>
   }
 </div>
 
-<app-zoomer (zoomChange)="onZoomChange($event)" />
+<app-zoomer
+  [saveDisabled]="!annotationsService.changed()"
+  (zoomChange)="onZoomChange($event)"
+  (onSave)="save()"
+  (onClear)="clear()"
+/>

@@ -1,4 +1,4 @@
-export interface PageData {
+export interface PageModel {
   number: number;
   imageUrl: string;
 }
