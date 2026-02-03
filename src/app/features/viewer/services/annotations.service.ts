@@ -57,7 +57,6 @@ export class AnnotationsService {
 
       componentRef.instance.annotation.subscribe((value) => {
         this.changed.set(true);
-        console.log(value);
       });
 
       const hostElement = container.element.nativeElement;

@@ -6,7 +6,6 @@ import {
   DestroyRef,
   ViewContainerRef,
   viewChildren,
-  OnInit,
   effect,
 } from '@angular/core';
 import { DocumentDataService } from './services/document-data.service';
@@ -50,7 +49,6 @@ export class Viewer {
           .getAnnotationsByDocId(this.routeParams()?.['id'])
           .pipe()
           .subscribe((annotations: AnnotationModel[]) => {
-            console.log(annotations);
             this.annotationsService.addAnnotations(annotations, this.pages());
             this.annotationsService.resetChanged();
           });
@@ -90,27 +88,40 @@ export class Viewer {
 
   public onPageClick(event: PointerEvent, id: number): void {
     event.preventDefault();
-    const target = event.target as HTMLElement;
+    const container = event.target as HTMLElement;
 
-    if (target.nodeName !== 'IMG') {
+    if (!container.classList.contains('annotations')) {
       return;
     }
 
-    const element = event.currentTarget as HTMLElement;
-    const rect = element.getBoundingClientRect();
-
-    const scaleX = element.offsetWidth / rect.width;
-    const scaleY = element.offsetHeight / rect.height;
+    const { x, y } = this.calculateAnnotationPoint(container, event.clientX, event.clientY);
 
     const annotation: AnnotationModel = {
       pageId: id,
-      content: 'annotation',
-      height: 0,
-      width: 0,
-      x: (event.clientX - rect.left) * scaleX,
-      y: (event.clientY - rect.top) * scaleY,
+      content: '',
+      x,
+      y,
     };
 
     this.annotationsService.addAnnotations([annotation], this.pages());
+  }
+
+  private calculateAnnotationPoint(
+    container: HTMLElement,
+    clientX: number,
+    clientY: number,
+  ): Record<string, number> {
+    const rect = container.getBoundingClientRect();
+
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+
+    const percentX = parseFloat(((x / rect.width) * 100).toFixed(2));
+    const percentY = parseFloat(((y / rect.height) * 100).toFixed(2));
+
+    return {
+      x: percentX,
+      y: percentY,
+    };
   }
 }

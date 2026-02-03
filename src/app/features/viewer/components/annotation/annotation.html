@@ -1,5 +1,6 @@
 <div class="annotation">
-  <div class="actions">
+  <div class="point"></div>
+  <div class="actions drag-handler">
     <p class="mover">
       <tui-icon icon="@tui.move" />
       <span>Take to move</span>
@@ -11,6 +12,7 @@
   <tui-textfield tuiTextfieldSize="s">
     <textarea
       tuiTextarea
+      placeholder="Enter Text"
       [tuiTextfieldCleaner]="false"
       [min]="3"
       [max]="10"

@@ -18,7 +18,6 @@ export class DocumentDataService {
   }
 
   public saveAnnotations(id: string, annotations: AnnotationModel[]): Observable<void> {
-    console.log(annotations);
     localStorage.setItem(id, JSON.stringify(annotations));
     return of(void 0);
   }

@@ -11,6 +11,16 @@
 .annotation {
   position: relative;
 
+  .point {
+    position: absolute;
+    left: -2px;
+    top: -2px;
+    width: 4px;
+    height: 4px;
+    background: var(--tui-background-accent-2);
+    border-radius: 50%;
+  }
+
   .actions {
     height: 10px;
     cursor: move;
@@ -21,17 +31,17 @@
     border-radius: 10px 10px 0 0;
 
     button {
+      --t-bg: var(--tui-background-base-alt);
       position: absolute;
       z-index: 1000;
       color-scheme: dark;
-      --t-bg: var(--tui-background-base-alt);
       top: -20px;
       right: -25px;
     }
 
     .mover {
       font-style: italic;
-      color: #8f8d8d;
+      color: #5b5b5b;
       display: flex;
       justify-content: center;
       width: 100%;
@@ -40,14 +50,16 @@
         width: 14px;
       }
     }
-
-
   }
 
   textarea {
     width: 100%;
     height: 100%;
-    color: #252525;
+    color: #303030;
     font-size: 16px;
+  }
+
+  textarea::placeholder {
+    color: #909090;
   }
 }
