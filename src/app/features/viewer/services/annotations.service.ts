@@ -13,6 +13,7 @@ import { AnnotationModel } from '../models/annotation.model';
 export class AnnotationsService {
   private injector = inject(Injector);
   private componentRefs = new Set<ComponentRef<Annotation>>();
+
   public changed = signal(false);
 
   public resetChanged(): void {

@@ -11,32 +11,33 @@ import { TuiBadge } from '@taiga-ui/kit';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Toolbar {
-  private initScale = 1;
-  private zoomStep: number = 0.25;
+  private readonly initScale = 1;
+  private readonly zoomStep: number = 0.25;
+  private readonly maxScale: number = 1.5;
+  private readonly minScale: number = 0.5;
   public currentScale: number = 1;
-  public maxScale: number = 1.5;
-  public minScale: number = 0.5;
 
   public saveDisabled = input.required<boolean>();
+
   public zoomChange = output<number>();
   public onSave = output();
   public onClear = output();
 
-  protected zoomIn() {
+  public zoomIn(): void {
     if (this.currentScale < this.maxScale) {
       this.currentScale = Math.min(this.maxScale, this.currentScale + this.zoomStep);
       this.zoomChange.emit(this.currentScale);
     }
   }
 
-  protected zoomOut() {
+  public zoomOut(): void {
     if (this.currentScale > this.minScale) {
       this.currentScale = Math.max(this.minScale, this.currentScale - this.zoomStep);
       this.zoomChange.emit(this.currentScale);
     }
   }
 
-  protected resetZoom() {
+  public resetZoom(): void {
     this.currentScale = this.initScale;
     this.zoomChange.emit(this.currentScale);
   }

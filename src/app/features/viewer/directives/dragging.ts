@@ -30,7 +30,7 @@ export class Dragging implements AfterViewInit {
     this.container = this.element.nativeElement.parentElement;
   }
 
-  onMouseDown(event: MouseEvent): void {
+  public onMouseDown(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     const isHandle = target.closest(this.dragHandleSelector());
 
@@ -50,7 +50,7 @@ export class Dragging implements AfterViewInit {
     event.preventDefault();
   }
 
-  onMouseMove(event: MouseEvent): void {
+  public onMouseMove(event: MouseEvent): void {
     if (!this.isDragging) {
       return;
     }
@@ -80,7 +80,7 @@ export class Dragging implements AfterViewInit {
     this.element.nativeElement.style.top = `${newTopPercent}%`;
   }
 
-  onMouseUp(): void {
+  public onMouseUp(): void {
     if (this.isDragging) {
       const { top, left } = this.element.nativeElement.style;
       this.dragend.emit({ top, left });
