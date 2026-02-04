@@ -19,11 +19,13 @@ export class DocumentDataService {
 
   public saveAnnotations(id: string, annotations: AnnotationModel[]): Observable<void> {
     localStorage.setItem(id, JSON.stringify(annotations));
+    // В продакшен будет взаимодействие с бэком, поэтому эмитируем Observable
     return of(void 0);
   }
 
   public getAnnotationsByDocId(id: string): Observable<AnnotationModel[]> {
     try {
+      // В продакшен будет взаимодействие с бэком, поэтому эмитируем Observable
       return of(JSON.parse(localStorage.getItem(id) ?? '') ?? []);
     } catch (error) {
       return of([]);

@@ -30,12 +30,13 @@ import { AnnotationModel } from './models/annotation.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Viewer {
+  public annotationsService = inject(AnnotationsService);
   private dataService = inject(DocumentDataService);
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
-  public annotationsService = inject(AnnotationsService);
 
   private readonly initWidth = 1200;
+
   public width = signal(this.initWidth);
   public documentData = toSignal(this.getDocumentData());
 
@@ -47,7 +48,7 @@ export class Viewer {
       if (this.pages().length && this.routeParams()?.['id']) {
         this.dataService
           .getAnnotationsByDocId(this.routeParams()?.['id'])
-          .pipe()
+          .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe((annotations: AnnotationModel[]) => {
             this.annotationsService.addAnnotations(annotations, this.pages());
             this.annotationsService.resetChanged();
@@ -56,16 +57,7 @@ export class Viewer {
     });
   }
 
-  private getDocumentData(): Observable<DocumentModel> {
-    return this.route.params.pipe(
-      switchMap((params) => {
-        return this.dataService.getDocumentById(params['id']);
-      }),
-      shareReplay(),
-    );
-  }
-
-  public onZoomChange(zoom: number) {
+  public onZoomChange(zoom: number): void {
     this.width.set(this.initWidth * zoom);
   }
 
@@ -104,6 +96,15 @@ export class Viewer {
     };
 
     this.annotationsService.addAnnotations([annotation], this.pages());
+  }
+
+  private getDocumentData(): Observable<DocumentModel> {
+    return this.route.params.pipe(
+      switchMap((params) => {
+        return this.dataService.getDocumentById(params['id']);
+      }),
+      shareReplay(),
+    );
   }
 
   private calculateAnnotationPoint(
