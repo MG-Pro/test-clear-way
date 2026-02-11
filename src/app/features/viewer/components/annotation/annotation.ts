@@ -4,9 +4,10 @@ import {
   computed,
   effect,
   inject,
-  model,
+  input,
   output,
   signal,
+  untracked,
 } from '@angular/core';
 import { AnnotationModel } from '../../models/annotation.model';
 import { TuiButtonClose, TuiTextarea } from '@taiga-ui/kit';
@@ -24,21 +25,25 @@ import { Dragging } from '../../directives/dragging';
   host: {
     '[style.top.%]': 'top()',
     '[style.left.%]': 'left()',
+    '(onDragend)': 'updatePoint($event)',
   },
   hostDirectives: [
     {
       directive: Dragging,
+      inputs: ['dragHandleSelector'],
+      outputs: ['onDragend'],
     },
   ],
 })
 export class Annotation {
-  public annotation = model.required<AnnotationModel>();
-  public close = output();
+  public annotation = input.required<AnnotationModel>();
 
   public text = signal('');
 
   public top = computed(() => this.annotation()?.y || 0);
   public left = computed(() => this.annotation()?.x || 0);
+  public onDelete = output<AnnotationModel>();
+  public onUpdate = output<AnnotationModel>();
 
   constructor() {
     effect(() => {
@@ -46,19 +51,20 @@ export class Annotation {
     });
 
     effect(() => {
-      this.annotation.update((value) => {
-        return { ...value, content: this.text() };
-      });
-    });
+      const annotation = untracked(this.annotation);
 
-    inject(Dragging).dragend.subscribe((value) => {
-      this.update(value);
+      this.onUpdate.emit({
+        ...annotation,
+        content: this.text(),
+      });
     });
   }
 
-  public update({ top, left }: { top: string; left: string }) {
-    this.annotation.update((annotation) => {
-      return { ...annotation, x: parseFloat(left), y: parseFloat(top) };
+  protected updatePoint(value: { top: string; left: string }) {
+    this.onUpdate.emit({
+      ...this.annotation(),
+      x: parseFloat(value.left),
+      y: parseFloat(value.top),
     });
   }
 }

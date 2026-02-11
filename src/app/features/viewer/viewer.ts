@@ -4,9 +4,7 @@ import {
   ChangeDetectionStrategy,
   signal,
   DestroyRef,
-  ViewContainerRef,
-  viewChildren,
-  effect,
+  OnInit,
 } from '@angular/core';
 import { DocumentDataService } from './services/document-data.service';
 import { DocumentModel } from './models/document.model';
@@ -19,18 +17,19 @@ import { NgOptimizedImage, UpperCasePipe } from '@angular/common';
 import { Toolbar } from './components/toolbar/toolbar.component';
 import { AnnotationsService } from './services/annotations.service';
 import { AnnotationModel } from './models/annotation.model';
+import { Annotation } from './components/annotation/annotation';
 
 @Component({
   selector: 'app-viewer',
   standalone: true,
-  imports: [TuiAppearance, TuiCard, UpperCasePipe, NgOptimizedImage, Toolbar],
+  imports: [TuiAppearance, TuiCard, UpperCasePipe, NgOptimizedImage, Toolbar, Annotation],
   providers: [DocumentDataService, AnnotationsService],
   templateUrl: './viewer.html',
   styleUrl: './viewer.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Viewer {
-  public annotationsService = inject(AnnotationsService);
+export class Viewer implements OnInit {
+  private annotationsService = inject(AnnotationsService);
   private dataService = inject(DocumentDataService);
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
@@ -39,22 +38,11 @@ export class Viewer {
 
   public width = signal(this.initWidth);
   public documentData = toSignal(this.getDocumentData());
+  public annotations = signal<AnnotationModel[]>([]);
+  public changed = signal(false);
 
-  private pages = viewChildren('page', { read: ViewContainerRef });
-  private routeParams = toSignal(this.route.params);
-
-  constructor() {
-    effect(() => {
-      if (this.pages().length && this.routeParams()?.['id']) {
-        this.dataService
-          .getAnnotationsByDocId(this.routeParams()?.['id'])
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe((annotations: AnnotationModel[]) => {
-            this.annotationsService.addAnnotations(annotations, this.pages());
-            this.annotationsService.resetChanged();
-          });
-      }
-    });
+  public ngOnInit(): void {
+    this.getAnnotations();
   }
 
   public onZoomChange(zoom: number): void {
@@ -62,23 +50,23 @@ export class Viewer {
   }
 
   public save(): void {
-    const annotations = this.annotationsService.getAnnotations();
     const id = this.documentData()?.id;
     if (id) {
       this.dataService
-        .saveAnnotations(id, annotations)
+        .saveAnnotations(id, this.annotations())
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(() => {
-          this.annotationsService.resetChanged();
+          this.getAnnotations();
         });
     }
   }
 
   public clear(): void {
-    this.annotationsService.clearAnnotations();
+    this.annotations.set([]);
+    this.changed.set(true);
   }
 
-  public onPageClick(event: PointerEvent, id: number): void {
+  public onPageClick(event: PointerEvent): void {
     event.preventDefault();
     const container = event.target as HTMLElement;
 
@@ -89,13 +77,42 @@ export class Viewer {
     const { x, y } = this.calculateAnnotationPoint(container, event.clientX, event.clientY);
 
     const annotation: AnnotationModel = {
-      pageId: id,
+      id: Date.now(),
       content: '',
       x,
       y,
     };
 
-    this.annotationsService.addAnnotations([annotation], this.pages());
+    this.annotations.update((annotations) => annotations.concat(annotation));
+    this.changed.set(true);
+  }
+
+  public onDeleteAnnotation(annotation: AnnotationModel) {
+    this.annotations.update((annotations) => annotations.filter(({ id }) => id !== annotation.id));
+    this.changed.set(true);
+  }
+
+  public onUpdateAnnotation(editable: AnnotationModel) {
+    this.annotations.update((annotations) =>
+      annotations.map((annotation) => {
+        return annotation.id === editable.id ? editable : annotation;
+      }),
+    );
+    this.changed.set(true);
+  }
+
+  private getAnnotations(): void {
+    this.route.params
+      .pipe(
+        switchMap((params) => {
+          return this.dataService.getAnnotationsByDocId(params['id']);
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((annotations: AnnotationModel[]) => {
+        this.annotations.set(annotations);
+        this.changed.set(false);
+      });
   }
 
   private getDocumentData(): Observable<DocumentModel> {
@@ -107,11 +124,7 @@ export class Viewer {
     );
   }
 
-  private calculateAnnotationPoint(
-    container: HTMLElement,
-    clientX: number,
-    clientY: number,
-  ): Record<string, number> {
+  private calculateAnnotationPoint(container: HTMLElement, clientX: number, clientY: number) {
     const rect = container.getBoundingClientRect();
 
     const x = clientX - rect.left;

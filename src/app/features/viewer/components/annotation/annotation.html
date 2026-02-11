@@ -6,7 +6,13 @@
       <span>Take to move</span>
     </p>
 
-    <button size="xs" tuiButtonClose tuiIconButton type="button" (click)="close.emit()"></button>
+    <button
+      size="xs"
+      tuiButtonClose
+      tuiIconButton
+      type="button"
+      (click)="onDelete.emit(this.annotation())"
+    ></button>
   </div>
 
   <tui-textfield tuiTextfieldSize="s">

@@ -1,5 +1,5 @@
 export interface AnnotationModel {
-  pageId: number;
+  id: number;
   x: number;
   y: number;
   content?: string;

@@ -11,7 +11,7 @@ import { AfterViewInit, Directive, ElementRef, inject, input, output } from '@an
 })
 export class Dragging implements AfterViewInit {
   public dragHandleSelector = input('.drag-handler');
-  public dragend = output<{ top: string; left: string }>();
+  public onDragend = output<{ top: string; left: string }>();
 
   private container!: HTMLElement;
   private element = inject(ElementRef);
@@ -22,11 +22,6 @@ export class Dragging implements AfterViewInit {
   private initialTopPercent = 0;
 
   ngAfterViewInit(): void {
-    const { position } = this.element.nativeElement.style;
-    if (position === 'static') {
-      throw new Error('Host element must have position absolute');
-    }
-
     this.container = this.element.nativeElement.parentElement;
   }
 
@@ -83,7 +78,7 @@ export class Dragging implements AfterViewInit {
   public onMouseUp(): void {
     if (this.isDragging) {
       const { top, left } = this.element.nativeElement.style;
-      this.dragend.emit({ top, left });
+      this.onDragend.emit({ top, left });
     }
 
     this.isDragging = false;

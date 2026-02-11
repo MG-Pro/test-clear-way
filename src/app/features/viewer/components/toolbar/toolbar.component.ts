@@ -3,7 +3,7 @@ import { TuiButton, TuiGroup } from '@taiga-ui/core';
 import { TuiBadge } from '@taiga-ui/kit';
 
 @Component({
-  selector: 'app-zoomer',
+  selector: 'app-toolbar',
   standalone: true,
   imports: [TuiGroup, TuiButton, TuiBadge],
   templateUrl: './toolbar.component.html',
